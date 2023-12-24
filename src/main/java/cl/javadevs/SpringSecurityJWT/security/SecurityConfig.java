@@ -55,7 +55,7 @@ public class SecurityConfig {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeHttpRequests() //Petion http autorizada
-        .requestMatchers("/api/auth/**")
+        .requestMatchers("/api/auth/*")
         .permitAll()
         .anyRequest()
         .authenticated()

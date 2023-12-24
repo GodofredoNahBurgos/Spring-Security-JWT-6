@@ -35,7 +35,7 @@ public class CustomUsersDetailsService implements UserDetailsService {
     //Metodo para traer a un usuario consus datos
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuarios usuarios = iUsuarioRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User not found"));
+        Usuarios usuarios = iUsuarioRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("Usuario no encontrado"));
         return new User(usuarios.getUsername(), usuarios.getPassword(), mapToAutorities(usuarios.getRoles()));
     }
 

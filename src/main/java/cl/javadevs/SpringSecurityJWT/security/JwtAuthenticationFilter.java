@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -26,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     private JwtGenerador jwtGenerador;
 
     private String obtenerTokenDeSolicitud(HttpServletRequest request){
-        String bearerToken = request.getHeader("Authotization");
+        String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7, bearerToken.length());
         }

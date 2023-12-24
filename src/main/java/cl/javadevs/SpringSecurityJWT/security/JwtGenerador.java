@@ -2,8 +2,6 @@ package cl.javadevs.SpringSecurityJWT.security;
 
 import java.util.Date;
 
-import javax.naming.AuthenticationException;
-
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -53,7 +51,6 @@ public class JwtGenerador {
         } catch (Exception e) {
             throw new AuthenticationCredentialsNotFoundException("JWT ah expirado o esta incorrecto");
         }
-
     }
 
 }
