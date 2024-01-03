@@ -1,8 +1,7 @@
 package cl.javadevs.SpringSecurityJWT.dtos;
 
 import lombok.Data;
-
-//Regresara informacion del token que se creo
+//Esta clase va a ser la que nos devolverá la información con el token y el tipo que tenga este
 @Data
 public class DtoAuthRespuesta {
     private String accessToken;

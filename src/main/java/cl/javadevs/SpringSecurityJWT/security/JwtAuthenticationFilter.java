@@ -17,6 +17,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/*La función de esta clase será validar la información del token y si esto es exitoso,
+establecerá la autenticación de un usuario en la solicitud o en el contexto de seguridad de nuestra aplicación*/
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
     @Autowired
@@ -24,32 +26,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     @Autowired
     private JwtGenerador jwtGenerador;
 
+     /*Con el siguiente método extraeremos  el token JWT de la cabecera de nuestra petición Http("Authorization")
+     * luego lo validaremos y finalmente se retornará*/
     private String obtenerTokenDeSolicitud(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            //Aca si se encuentra el token JWT, se devuelve una subcadena de "bearerToken" que comienza después de los primeros 7 caracteres hasta el final de la cadena
             return bearerToken.substring(7, bearerToken.length());
         }
         return null;
     }
 
-    //Valida informacion del token, si es exitoso establece la authentificacion
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    @Override 
+    protected void doFilterInternal(
+    //Solicitud entrante
+    HttpServletRequest request, 
+    //Respuesta saliente
+    HttpServletResponse response, 
+    //Mecanismo para invocar el siguiente filtro en la siguiente cadena de filtros
+    FilterChain filterChain)
             throws ServletException, IOException {
 
+                //Obtenemos los datos del token mediante el método desarrollado arriba
                 String token = obtenerTokenDeSolicitud(request);
-
+                // Validamos la información del token
                 if (StringUtils.hasText(token) && jwtGenerador.validarToken(token)) {
+                    //Asignamos el nombre de usuario contenido en el objeto "token" y lo pasamos a nuestra variable "username"
                     String username = jwtGenerador.obtenerUsernameDeJwt(token);
+                    //Luego creamos el objeto userDetails el cual contendrá todos los detalles de nuestro username, ósea nombre, pw y roles segun el método loadUserByUsername
                     UserDetails userDetails = customUsersDetailsService.loadUserByUsername(username);
+                    //Cargamos una lista de String con los roles alojados en BD
                     List<String> userRoles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
-
+                    //Comprobamos que el usuario autenticado posee alguno de los siguientes roles alojados en BD
                     if (userRoles.contains("USER") || userRoles.contains("ADMIN")) {
+                        /*Creamos el objeto UsernamePasswordAuthenticationToken el cual contendrá los detalles de autenticación del usuario*/
                         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        //Aca establecimos información adicional de la autenticación, como por ejemplo la dirección ip del usuario, o el agente de usuario para hacer la solicitud
                         usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        //Establecemos el objeto anterior (autenticación del usuario) en el contexto de seguridad
                         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                     }
                 }
+                //Permite que la solicitud continue hacia el siguiente filtro en la cadena de filtro.
                 filterChain.doFilter(request, response);
     }
 

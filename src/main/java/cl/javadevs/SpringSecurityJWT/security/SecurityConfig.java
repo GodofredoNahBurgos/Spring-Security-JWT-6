@@ -15,7 +15,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+//Le indica al contenedor de spring que esta es una clase de seguridad al momento de arrancar la aplicación
 @EnableWebSecurity
+//Indicamos que se activa la seguridad web en nuestra aplicación y además esta será una clase la cual contendrá toda la configuración referente a la seguridad
 public class SecurityConfig {
 
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -25,37 +27,38 @@ public class SecurityConfig {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
-    //Bean para verificar informacion de usuarios que se logueen en nuestra api
+    //Este bean va a encargarse de verificar la información de los usuarios que se loguearán en nuestra api
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
 
     }
 
-    //Encriptar todas nuestras contraseñas
+    //Con este bean nos encargaremos de encriptar todas nuestras contraseñas
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
-    //Inconrporara el filtro de seguridad JSON Web Token
+    //Este bean incorporará el filtro de seguridad de json web token que creamos en nuestra clase anterior
     @Bean
     JwtAuthenticationFilter jwtAuthenticationFilter(){
         return new JwtAuthenticationFilter();
     }
 
-    //Establece una cadena de filtros de segridad en nuestra aplicacion aca determinaresmos permisos segun roles
+    //Vamos a crear un bean el cual va a establecer una cadena de filtros de seguridad en nuestra aplicación.
+    // Y es aquí donde determinaremos los permisos segun los roles de usuarios para acceder a nuestra aplicación
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
         .csrf().disable()
-        .exceptionHandling()//Permitirmos manejo de exepciones
-        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+        .exceptionHandling() //Permitimos el manejo de excepciones
+        .authenticationEntryPoint(jwtAuthenticationEntryPoint) //Nos establece un punto de entrada personalizado de autenticación para el manejo de autenticaciones no autorizadas
         .and()
-        .sessionManagement()//Gestion de sesiones
+        .sessionManagement() //Permite la gestión de sessiones
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
-        .authorizeHttpRequests() //Petion http autorizada
+        .authorizeHttpRequests() //Toda petición http debe ser autorizada
         .requestMatchers("/api/auth/**").permitAll()
         .requestMatchers(HttpMethod.POST, "/api/celular/crear").hasAuthority("ADMIN")
         .requestMatchers(HttpMethod.GET,"/api/celular/listar").hasAnyAuthority("ADMIN" , "USER")

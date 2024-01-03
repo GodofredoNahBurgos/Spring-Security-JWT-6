@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint{
 
-    //Clase para manejar las exepciones de tipo autentificacion
+    //Clase para poder manejar las excepciones de tipo autenticación en nuestra app
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {

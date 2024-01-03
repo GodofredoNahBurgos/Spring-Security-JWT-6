@@ -27,12 +27,12 @@ public class CustomUsersDetailsService implements UserDetailsService {
         this.iUsuarioRepository = iUsuarioRepository;
     }
 
-    //Trae una lista de autoridades
+    //Método para traernos una lista de autoridades por medio de una lista de roles
     public Collection<GrantedAuthority> mapToAutorities(List<Roles> roles){
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
     }
 
-    //Metodo para traer a un usuario consus datos
+    //Método para traernos un usuario con todos sus datos por medio de sus username
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuarios usuarios = iUsuarioRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("Usuario no encontrado"));
